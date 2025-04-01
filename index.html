@@ -1,13 +1,1337 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
-  <title>Hello, World!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupChat 💬</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --light-color: #f8f9fa;
+            --dark-color: #202124;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .group-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .online-count {
+            background-color: var(--accent-color);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
+        .chat-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #f1f3f4;
+            border-right: 1px solid #ddd;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .user-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .user-item:hover {
+            background-color: #e8eaed;
+        }
+        
+        .user-item.active {
+            background-color: #d2e3fc;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        
+        .user-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+        
+        .online {
+            background-color: var(--secondary-color);
+        }
+        
+        .offline {
+            background-color: #ccc;
+        }
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .received {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .sender-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-left: 10px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            font-size: 1rem;
+            margin-right: 10px;
+            transition: border 0.3s;
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .typing-indicator.active {
+            opacity: 1;
+        }
+        
+        .typing-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-left: 5px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* Login modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.3s;
+        }
+        
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .sidebar {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>
-    Hello, World!
-  </h1>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>GroupChat 💬</h1>
+            <div class="group-info">
+                <span id="online-count">0 online</span>
+                <span class="online-count" id="group-member-count">0 members</span>
+            </div>
+        </div>
+        
+        <div class="chat-area">
+            <div class="sidebar">
+                <h3 style="margin-bottom: 15px;">Group Members</h3>
+                <ul class="user-list" id="user-list">
+                    <!-- Users will appear here -->
+                </ul>
+            </div>
+            
+            <div class="chat-main">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will appear here -->
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+                    <button class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="login-modal">
+            <h2>Join Group Chat</h2>
+            <input type="text" id="username-input" class="login-input" placeholder="Your name">
+            <input type="text" id="group-id-input" class="login-input" placeholder="Group ID (or leave blank for new)">
+            <button class="login-btn" id="login-btn">Join Chat</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzm_3asKGQidVJ4O1kcZPkc4YMyH9l1Z758Sd3qkqPm40_E-z8dtM7b6HRSrE0i5UYi/exec'; // Replace with your Google Script URL
+        const POLL_INTERVAL = 3000; // 3 seconds
+        const TYPING_DELAY = 2000; // 2 seconds
+        
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const userList = document.getElementById('user-list');
+        const onlineCount = document.getElementById('online-count');
+        const groupMemberCount = document.getElementById('group-member-count');
+        const loginModal = document.getElementById('login-modal');
+        const usernameInput = document.getElementById('username-input');
+        const groupIdInput = document.getElementById('group-id-input');
+        const loginBtn = document.getElementById('login-btn');
+        
+        // App state
+        let currentUser = null;
+        let currentGroupId = null;
+        let users = {};
+        let lastMessageId = 0;
+        let typingTimeout = null;
+        let isTyping = false;
+        
+        // Initialize the app
+        function init() {
+            // Event listeners
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            messageInput.addEventListener('input', () => {
+                if (!isTyping) {
+                    isTyping = true;
+                    updateTypingStatus(true);
+                }
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    isTyping = false;
+                    updateTypingStatus(false);
+                }, TYPING_DELAY);
+            });
+            
+            loginBtn.addEventListener('click', joinChat);
+            
+            // Show login modal
+            loginModal.style.display = 'flex';
+        }
+        
+        // Join chat function
+        function joinChat() {
+            const username = usernameInput.value.trim();
+            const groupId = groupIdInput.value.trim();
+            
+            if (!username) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            currentUser = username;
+            currentGroupId = groupId || generateGroupId();
+            
+            // Hide login modal
+            loginModal.style.display = 'none';
+            
+            // Update UI
+            document.title = `${currentGroupId} - GroupChat`;
+            
+            // Start polling for messages
+            loadMessages();
+            setInterval(loadMessages, POLL_INTERVAL);
+            
+            // Register user
+            registerUser();
+        }
+        
+        // Generate a random group ID
+        function generateGroupId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+        
+        // Register user in the group
+        function registerUser() {
+            const data = {
+                action: 'register',
+                groupId: currentGroupId,
+                username: currentUser
+            };
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateUserList(data.users);
+            })
+            .catch(error => console.error('Error registering user:', error));
+        }
+        
+        // Update typing status
+        function updateTypingStatus(typing) {
+            const data = {
+                action: 'typing',
+                groupId: currentGroupId,
+                username: currentUser,
+                isTyping: typing
+            };
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .catch(error => console.error('Error updating typing status:', error));
+        }
+        
+        // Load messages from server
+        function loadMessages() {
+            fetch(`${SCRIPT_URL}?action=getMessages&groupId=${currentGroupId}&lastId=${lastMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            addMessageToChat(msg);
+                            lastMessageId = Math.max(lastMessageId, msg.id);
+                        });
+                    }
+                    
+                    if (data.users) {
+                        updateUserList(data.users);
+                    }
+                    
+                    if (data.typingUsers) {
+                        updateTypingIndicators(data.typingUsers);
+                    }
+                })
+                .catch(error => console.error('Error loading messages:', error));
+        }
+        
+        // Send message to group
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && currentUser) {
+                const timestamp = new Date().toISOString();
+                const messageData = {
+                    text: message,
+                    sender: currentUser,
+                    timestamp: timestamp,
+                    groupId: currentGroupId
+                };
+                
+                // Add message to chat immediately
+                addMessageToChat({
+                    id: Date.now(),
+                    text: message,
+                    sender: currentUser,
+                    timestamp: timestamp,
+                    isCurrentUser: true
+                });
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Send to server
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'sendMessage',
+                        ...messageData
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .catch(error => console.error('Error sending message:', error));
+            }
+        }
+        
+        // Add message to chat UI
+        function addMessageToChat(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(message.isCurrentUser ? 'sent' : 'received');
+            
+            const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-info">
+                    <span class="sender-name">${message.sender}</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-text">${message.text}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Update user list
+        function updateUserList(userData) {
+            users = userData;
+            userList.innerHTML = '';
+            
+            let onlineUsers = 0;
+            
+            Object.keys(users).forEach(username => {
+                const user = users[username];
+                const userItem = document.createElement('li');
+                userItem.classList.add('user-item');
+                
+                if (username === currentUser) {
+                    userItem.classList.add('active');
+                }
+                
+                const statusClass = user.isOnline ? 'online' : 'offline';
+                if (user.isOnline) onlineUsers++;
+                
+                userItem.innerHTML = `
+                    <div class="user-avatar">${username.charAt(0).toUpperCase()}</div>
+                    <span>${username}</span>
+                    <div class="user-status ${statusClass}"></div>
+                `;
+                
+                userList.appendChild(userItem);
+            });
+            
+            // Update counters
+            onlineCount.textContent = `${onlineUsers} online`;
+            groupMemberCount.textContent = `${Object.keys(users).length} members`;
+        }
+        
+        // Update typing indicators
+        function updateTypingIndicators(typingUsers) {
+            // Remove current typing indicators
+            const existingIndicators = document.querySelectorAll('.typing-indicator');
+            existingIndicators.forEach(el => el.remove());
+            
+            // Add new ones
+            typingUsers.forEach(username => {
+                if (username !== currentUser) {
+                    const typingDiv = document.createElement('div');
+                    typingDiv.classList.add('typing-indicator', 'active');
+                    typingDiv.innerHTML = `
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <span class="typing-text">${username} is typing...</span>
+                    `;
+                    
+                    chatMessages.appendChild(typingDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupChat 💬</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --light-color: #f8f9fa;
+            --dark-color: #202124;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .group-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .online-count {
+            background-color: var(--accent-color);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
+        .chat-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #f1f3f4;
+            border-right: 1px solid #ddd;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .user-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .user-item:hover {
+            background-color: #e8eaed;
+        }
+        
+        .user-item.active {
+            background-color: #d2e3fc;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        
+        .user-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+        
+        .online {
+            background-color: var(--secondary-color);
+        }
+        
+        .offline {
+            background-color: #ccc;
+        }
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .received {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .sender-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-left: 10px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            font-size: 1rem;
+            margin-right: 10px;
+            transition: border 0.3s;
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .typing-indicator.active {
+            opacity: 1;
+        }
+        
+        .typing-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-left: 5px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* Login modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-modal h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.3s;
+        }
+        
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .sidebar {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>GroupChat 💬</h1>
+            <div class="group-info">
+                <span id="online-count">0 online</span>
+                <span class="online-count" id="group-member-count">0 members</span>
+            </div>
+        </div>
+        
+        <div class="chat-area">
+            <div class="sidebar">
+                <h3 style="margin-bottom: 15px;">Group Members</h3>
+                <ul class="user-list" id="user-list">
+                    <!-- Users will appear here -->
+                </ul>
+            </div>
+            
+            <div class="chat-main">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will appear here -->
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+                    <button class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="login-modal">
+            <h2>Join Group Chat</h2>
+            <input type="text" id="username-input" class="login-input" placeholder="Your name">
+            <input type="text" id="group-id-input" class="login-input" placeholder="Group ID (or leave blank for new)">
+            <button class="login-btn" id="login-btn">Join Chat</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzm_3asKGQidVJ4O1kcZPkc4YMyH9l1Z758Sd3qkqPm40_E-z8dtM7b6HRSrE0i5UYi/exec'; // Replace with your Google Script URL
+        const POLL_INTERVAL = 3000; // 3 seconds
+        const TYPING_DELAY = 2000; // 2 seconds
+        
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const userList = document.getElementById('user-list');
+        const onlineCount = document.getElementById('online-count');
+        const groupMemberCount = document.getElementById('group-member-count');
+        const loginModal = document.getElementById('login-modal');
+        const usernameInput = document.getElementById('username-input');
+        const groupIdInput = document.getElementById('group-id-input');
+        const loginBtn = document.getElementById('login-btn');
+        
+        // App state
+        let currentUser = null;
+        let currentGroupId = null;
+        let users = {};
+        let lastMessageId = 0;
+        let typingTimeout = null;
+        let isTyping = false;
+        
+        // Initialize the app
+        function init() {
+            // Event listeners
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            messageInput.addEventListener('input', () => {
+                if (!isTyping) {
+                    isTyping = true;
+                    updateTypingStatus(true);
+                }
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    isTyping = false;
+                    updateTypingStatus(false);
+                }, TYPING_DELAY);
+            });
+            
+            loginBtn.addEventListener('click', joinChat);
+            
+            // Show login modal
+            loginModal.style.display = 'flex';
+        }
+        
+        // Join chat function
+        function joinChat() {
+            const username = usernameInput.value.trim();
+            const groupId = groupIdInput.value.trim();
+            
+            if (!username) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            currentUser = username;
+            currentGroupId = groupId || generateGroupId();
+            
+            // Hide login modal
+            loginModal.style.display = 'none';
+            
+            // Update UI
+            document.title = `${currentGroupId} - GroupChat`;
+            
+            // Start polling for messages
+            loadMessages();
+            setInterval(loadMessages, POLL_INTERVAL);
+            
+            // Register user
+            registerUser();
+        }
+        
+        // Generate a random group ID
+        function generateGroupId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+        
+        // Register user in the group
+        function registerUser() {
+            const data = {
+                action: 'register',
+                groupId: currentGroupId,
+                username: currentUser
+            };
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateUserList(data.users);
+            })
+            .catch(error => console.error('Error registering user:', error));
+        }
+        
+        // Update typing status
+        function updateTypingStatus(typing) {
+            const data = {
+                action: 'typing',
+                groupId: currentGroupId,
+                username: currentUser,
+                isTyping: typing
+            };
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .catch(error => console.error('Error updating typing status:', error));
+        }
+        
+        // Load messages from server
+        function loadMessages() {
+            fetch(`${SCRIPT_URL}?action=getMessages&groupId=${currentGroupId}&lastId=${lastMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            addMessageToChat(msg);
+                            lastMessageId = Math.max(lastMessageId, msg.id);
+                        });
+                    }
+                    
+                    if (data.users) {
+                        updateUserList(data.users);
+                    }
+                    
+                    if (data.typingUsers) {
+                        updateTypingIndicators(data.typingUsers);
+                    }
+                })
+                .catch(error => console.error('Error loading messages:', error));
+        }
+        
+        // Send message to group
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && currentUser) {
+                const timestamp = new Date().toISOString();
+                const messageData = {
+                    text: message,
+                    sender: currentUser,
+                    timestamp: timestamp,
+                    groupId: currentGroupId
+                };
+                
+                // Add message to chat immediately
+                addMessageToChat({
+                    id: Date.now(),
+                    text: message,
+                    sender: currentUser,
+                    timestamp: timestamp,
+                    isCurrentUser: true
+                });
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Send to server
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'sendMessage',
+                        ...messageData
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .catch(error => console.error('Error sending message:', error));
+            }
+        }
+        
+        // Add message to chat UI
+        function addMessageToChat(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(message.isCurrentUser ? 'sent' : 'received');
+            
+            const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-info">
+                    <span class="sender-name">${message.sender}</span>
+                    <span class="message-time">${time}</span>
+                </div>
+                <div class="message-text">${message.text}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Update user list
+        function updateUserList(userData) {
+            users = userData;
+            userList.innerHTML = '';
+            
+            let onlineUsers = 0;
+            
+            Object.keys(users).forEach(username => {
+                const user = users[username];
+                const userItem = document.createElement('li');
+                userItem.classList.add('user-item');
+                
+                if (username === currentUser) {
+                    userItem.classList.add('active');
+                }
+                
+                const statusClass = user.isOnline ? 'online' : 'offline';
+                if (user.isOnline) onlineUsers++;
+                
+                userItem.innerHTML = `
+                    <div class="user-avatar">${username.charAt(0).toUpperCase()}</div>
+                    <span>${username}</span>
+                    <div class="user-status ${statusClass}"></div>
+                `;
+                
+                userList.appendChild(userItem);
+            });
+            
+            // Update counters
+            onlineCount.textContent = `${onlineUsers} online`;
+            groupMemberCount.textContent = `${Object.keys(users).length} members`;
+        }
+        
+        // Update typing indicators
+        function updateTypingIndicators(typingUsers) {
+            // Remove current typing indicators
+            const existingIndicators = document.querySelectorAll('.typing-indicator');
+            existingIndicators.forEach(el => el.remove());
+            
+            // Add new ones
+            typingUsers.forEach(username => {
+                if (username !== currentUser) {
+                    const typingDiv = document.createElement('div');
+                    typingDiv.classList.add('typing-indicator', 'active');
+                    typingDiv.innerHTML = `
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <span class="typing-text">${username} is typing...</span>
+                    `;
+                    
+                    chatMessages.appendChild(typingDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
